@@ -2,3 +2,4 @@
 # get Apache to run on the container
 
 service apache2 start
+echo "ServerName localhost" >> /etc/apache2/apache2.conf
