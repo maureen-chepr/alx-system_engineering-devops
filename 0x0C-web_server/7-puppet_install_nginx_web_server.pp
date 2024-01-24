@@ -1,36 +1,21 @@
-# Install Nginx web server w/ Puppet
-
-exec {'apt-get-update':
-  command => '/usr/bin/apt-get update',
-}
-
-package {'apache2.2-common':
-  ensure  => 'absent',
-  require => Exec['apt-get-update'],
-}
+# Install Nginx web server using Puppet
 
 package { 'nginx':
-  ensure  => 'installed',
-  require => Package['apache2.2-common'],
+  ensure => installed,
 }
 
-file { '/var/www/html/index.nginx-debian.html':
-  ensure  => 'present',
+file { '/var/www/html/index.html':
   content => 'Hello World!',
+}
+
+service { 'nginx':
+  ensure  => running,
   require => Package['nginx'],
 }
 
-file_line { 'perform a redirection':
-  ensure  => 'present',
-  path    => '/etc/nginx/sites-enabled/default',
-  line    => 'rewrite ^/redirect_me/$ https://github.com/maureen-chepr permanent;',
-  after   => 'root /var/www/html;',
-  require => Package['nginx'],
-  notify  => Service['nginx'],
-}
-
-service {'nginx':
-  ensure  => 'running',
-  require => File_line['perform a redirection'],
-  subscribe => File['/etc/nginx/sites-enabled/default'],
+exec { 'configure-nginx-redirect':
+  command     => "sed -i 's@listen 80 default_server;@listen 80 default_server;\\n\\tlocation /redirect_me {\\n\\t\\treturn 301 https://github.com/maureen-chepr;\\n\\t}@' /etc/nginx/sites-available/default",
+  path        => '/usr/bin',
+  refreshonly => true,
+  notify      => Service['nginx'],
 }
