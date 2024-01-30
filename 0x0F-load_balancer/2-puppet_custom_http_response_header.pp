@@ -25,7 +25,7 @@ file_line { 'addHeader':
 }
 
 file { '/var/www/html/index.html':
-  content => 'Holberton School',
+  content => 'Hello World!',
   require => Package['nginx'],
 }
 
