@@ -1,0 +1,32 @@
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+
+        root /var/www/html;
+
+        # Add index.php to the list if you are using PHP
+        index index.html;
+
+        server_name _;
+
+        location /hbnb_static {
+            alias /data/web_static/current/;
+        }
+
+        add_header X-Served-By $hostname;
+        error_page 404 /404.html;
+        location /redirect_me {
+            return 301 https://github.com/maureen-chepr;
+        }
+
+        location / {
+                # First attempt to serve request as file, then
+                #root data/web_static/releases/test;
+                #index index.html;
+                try_files $uri $uri/ =404;
+        }
+
+        location /airbnb-onepage/ {
+                proxy_pass http://127.0.0.1:5000;
+        }
+}
